@@ -1,0 +1,28 @@
+{
+  "name": "member-stats-sync-lambda",
+  "version": "1.0.0",
+  "description": "topcoder project to sync member stats from DynamoDB to ElasticSearch via Lambda",
+  "main": "handler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topcoder-platform/member-stats-sync-lambda.git"
+  },
+  "author": "Gungz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/topcoder-platform/member-stats-sync-lambda/issues"
+  },
+  "homepage": "https://github.com/topcoder-platform/member-stats-sync-lambda#readme",
+  "dependencies": {
+    "aws-sdk": "^2.466.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "aws-sdk-mock": "^4.4.0",
+    "jest": "^24.8.0",
+    "sinon": "^7.3.2"
+  }
+}
