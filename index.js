@@ -28,16 +28,19 @@ function postDocumentToES(eventName, doc, keys, context) {
 
   // constructing AWS Http Request based on eventName from the record 
   if(eventName === "MODIFY"){
+    console.log("MODIFY even listened");
     req.method = 'POST';
     req.path = path.join('/', esDomain.index, esDomain.doctype, id);
     req.region = esDomain.region;
     req.body = JSON.stringify(doc);
   }else if(eventName === "INSERT"){
+    console.log("INSERT even listened");
     req.method = 'PUT';
     req.path = path.join('/', esDomain.index, esDomain.doctype, id);
     req.region = esDomain.region;
     req.body = JSON.stringify(doc); 
   }else if(eventName === "REMOVE"){
+    console.log("REMOVE even listened");
     req.method = 'DELETE';
     req.path = path.join('/', esDomain.index, esDomain.doctype, id);
     req.region = esDomain.region;
@@ -53,8 +56,9 @@ function postDocumentToES(eventName, doc, keys, context) {
       var body = '';
       httpResp.on('data', chunk => {body += chunk; console.log(JSON.stringify(body));});
       httpResp.on('end', chunk => context.succeed());
+      console.log("Successfully indexed the document in ElasticSearch !");
   }, function(err) {
-      console.log('Error: ' + err);
+      console.log('Error occured during indexing: ' + err);
       context.fail();
   });
 }
