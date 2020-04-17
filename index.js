@@ -47,6 +47,7 @@ function postDocumentToES(eventName, doc, keys, context) {
   }
   req.headers['presigned-expires'] = false;
   req.headers['Host'] = endpoint.host;
+  req.headers['Content-Type'] = 'application/json';
   // Sign the request (Sigv4)
   var signer = new AWS.Signers.V4(req, 'es');
   signer.addAuthorization(creds, new Date());
@@ -55,11 +56,17 @@ function postDocumentToES(eventName, doc, keys, context) {
   send.handleRequest(req, null, function(httpResp) {
       var body = '';
       httpResp.on('data', chunk => {body += chunk; console.log(JSON.stringify(body));});
-      httpResp.on('end', chunk => context.succeed());
+      httpResp.on('end', chunk => {
+        if (context && context.succeed && typeof context.succeed === 'function') {
+          context.succeed()
+        }
+      });
       console.log("Successfully indexed the document in ElasticSearch !");
   }, function(err) {
       console.log('Error occured during indexing: ' + err);
-      context.fail();
+      if (context && context.succeed && typeof context.fail === 'function') {
+        context.fail()
+      };
   });
 }
 
