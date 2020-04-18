@@ -11,7 +11,7 @@ const endpoint =  new AWS.Endpoint(esDomain.endpoint);
 const creds = new AWS.EnvironmentCredentials('AWS');
 const util = require('./utils/util.js');
 
-exports.handleSync = (event, context, callback) => {
+exports.handleSync = async (event, context, callback) => {
   event.Records.forEach(record => {
     if(record.eventName === "MODIFY" || record.eventName === "INSERT" || record.eventName === "REMOVE") {
       exports.postDocumentToES(record.eventName, record.dynamodb.NewImage, record.dynamodb.Keys, context);
