@@ -21,6 +21,32 @@ package:
    - package*.json
    - serverless.yml
 
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-plugin-offline-dynamodb-stream
+  - serverless-offline
+
+
+custom:
+  serverless-offline:
+    dontPrintOutput: false
+  dynamodb:
+    stages:
+      - dev
+    start:
+      host: localhost
+      port: 8000
+      migrate: true
+      noStart: true
+  dynamodbStream:
+    host: localhost
+    port: 8000
+    streams:
+      - table: member_stats
+        functions:
+          - sync
+
 functions:
   sync:
     handler: index.handleSync
@@ -38,3 +64,25 @@ functions:
       ES_REGION: ${env:ES_REGION}
       ES_INDEX: ${env:ES_INDEX}
       ES_DOCTYPE: ${env:ES_DOCTYPE}
+
+resources:
+  Resources:
+    EventTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: groupId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: groupId
+            KeyType: RANGE
+        TableName: member_stats
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES

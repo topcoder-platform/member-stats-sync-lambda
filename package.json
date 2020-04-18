@@ -4,6 +4,7 @@
   "description": "topcoder project to sync member stats from DynamoDB to ElasticSearch via Lambda",
   "main": "handler.js",
   "scripts": {
+    "serverless:offline": "AWS_REGION=localhost AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxx+ ES_ENDPOINT=http://127.0.0.1:9200 ES_REGION=ddblocal ES_INDEX=stats ES_DOCTYPE=member serverless offline start",
     "test": "jest"
   },
   "repository": {
@@ -23,6 +24,11 @@
   "devDependencies": {
     "aws-sdk-mock": "^4.4.0",
     "jest": "^24.8.0",
+    "serverless": "^1.67.3",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^5.12.1",
+    "serverless-offline-dynamodb-streams": "^3.0.2",
+    "serverless-plugin-offline-dynamodb-stream": "^1.0.19",
     "sinon": "^7.3.2"
   }
 }
