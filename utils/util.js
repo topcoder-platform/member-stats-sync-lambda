@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 /**
  * Generate Elastic Search Index Doc ID from Keys of DynamoDB record stream.
  * @param {Object} keys Keys of DynamoDB record stream.
@@ -22,19 +24,31 @@ exports.generateESIndexID = function(keys){
   return id;
 }
 
-exports.convertToEsDocument = function (doc) {
-  for (const key in doc) {
-    if (!doc.hasOwnProperty(key)) {
+/**
+ * Converts a DynamoDB payload into a document that can be inserted into ES.
+ * @param {Object} doc DynamoDB payload
+ * @returns {Object} Elastic document
+ */
+exports.convertToEsDocument = function (payload) {
+  const stringifiedNestedFields = [
+    'DATA_SCIENCE', 'DESIGN', 'DEVELOP', 'maxRating'
+  ]
+  for (const key in payload) {
+    if (!payload.hasOwnProperty(key)) {
       continue
     }
-    const element = doc[key];
+    const element = payload[key];
     if (element.N) {
-      doc[key] = Number(element.N)
+      payload[key] = Number(element.N)
     } else if (element.S) {
-      doc[key] = String(element.S)
+      if (_.includes(stringifiedNestedFields, key)) {
+        payload[key] = JSON.parse(element.S)
+      } else {
+        payload[key] = String(element.S)
+      }
     } else {
-      doc[key] = exports.convertToEsDocument(element)
+      payload[key] = exports.convertToEsDocument(element)
     }
   }
-  return doc
+  return payload
 }
