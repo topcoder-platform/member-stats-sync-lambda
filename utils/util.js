@@ -30,9 +30,6 @@ exports.generateESIndexID = function(keys){
  * @returns {Object} Elastic document
  */
 exports.convertToEsDocument = function (payload) {
-  const stringifiedNestedFields = [
-    'DATA_SCIENCE', 'DESIGN', 'DEVELOP', 'maxRating'
-  ]
   for (const key in payload) {
     if (!payload.hasOwnProperty(key)) {
       continue
@@ -41,8 +38,12 @@ exports.convertToEsDocument = function (payload) {
     if (element.N) {
       payload[key] = Number(element.N)
     } else if (element.S) {
-      if (_.includes(stringifiedNestedFields, key)) {
-        payload[key] = JSON.parse(element.S)
+      let value = element.S
+      try {
+        value = JSON.parse(element.S)
+      } catch {}
+      if (!_.isString(value)) {
+        payload[key] = value
       } else {
         payload[key] = String(element.S)
       }
