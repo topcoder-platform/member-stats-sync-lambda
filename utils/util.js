@@ -41,7 +41,7 @@ exports.convertToEsDocument = function (payload) {
       let value = element.S
       try {
         value = JSON.parse(element.S)
-      } catch {}
+      } catch(e){}
       if (!_.isString(value)) {
         payload[key] = value
       } else {
