@@ -5,8 +5,11 @@ var esDomain = {
   doctype: process.env.ES_DOCTYPE //'member'
 };
 
+const isPrivate = Boolean(process.env.IS_PRIVATE)
+
 const AWS = require('aws-sdk');
 const path = require('path');
+const _ = require('lodash')
 const endpoint =  new AWS.Endpoint(esDomain.endpoint);
 const creds = new AWS.EnvironmentCredentials('AWS');
 const util = require('./utils/util.js');
@@ -32,13 +35,19 @@ function postDocumentToES(eventName, doc, keys, context) {
     req.method = 'POST';
     req.path = path.join('/', esDomain.index, esDomain.doctype, id);
     req.region = esDomain.region;
-    req.body = JSON.stringify(doc);
+    if (!isPrivate) {
+      doc.groupId = 10
+    }
+    req.body = JSON.stringify(util.convertToEsDocument(doc));
   }else if(eventName === "INSERT"){
     console.log("INSERT even listened");
     req.method = 'PUT';
     req.path = path.join('/', esDomain.index, esDomain.doctype, id);
     req.region = esDomain.region;
-    req.body = JSON.stringify(doc); 
+    if (!isPrivate) {
+      doc.groupId = 10
+    }
+    req.body = JSON.stringify(util.convertToEsDocument(doc));
   }else if(eventName === "REMOVE"){
     console.log("REMOVE even listened");
     req.method = 'DELETE';

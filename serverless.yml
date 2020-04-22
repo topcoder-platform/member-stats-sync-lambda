@@ -43,11 +43,31 @@ custom:
     host: localhost
     port: 8000
     streams:
-      - table: member_stats
+      - table: MemberStats_Private
+        functions:
+          - syncPrivate
+      - table: MemberStats
         functions:
           - sync
 
 functions:
+  syncPrivate:
+    handler: index.handleSync
+    role: ${env:LAMBDA_ROLE} 
+    description: Function to sync Dynamo DB member stats to Elastic Search # The description of your function
+    timeout: 30
+    events:
+     - stream:
+        arn: ${env:DB_STREAM}
+        batchSize: 100
+        startingPosition: LATEST
+        enabled: true
+    environment:
+      ES_ENDPOINT: ${env:ES_ENDPOINT}
+      ES_REGION: ${env:ES_REGION}
+      ES_INDEX: ${env:ES_INDEX}
+      ES_DOCTYPE: ${env:ES_DOCTYPE}
+      IS_PRIVATE: 'true'
   sync:
     handler: index.handleSync
     role: ${env:LAMBDA_ROLE} 
@@ -67,22 +87,39 @@ functions:
 
 resources:
   Resources:
-    EventTable:
+    MemberStatsTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
         AttributeDefinitions:
-          - AttributeName: groupId
-            AttributeType: S
           - AttributeName: userId
-            AttributeType: S
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        TableName: MemberStats
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
+        StreamSpecification:
+          StreamEnabled: true
+          StreamViewType: NEW_AND_OLD_IMAGES
+    MemberStatsPrivateTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: N
+          - AttributeName: groupId
+            AttributeType: N
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
           - AttributeName: groupId
             KeyType: RANGE
-        TableName: member_stats
+        TableName: MemberStats_Private
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
         StreamSpecification:
+          StreamEnabled: true
           StreamViewType: NEW_AND_OLD_IMAGES

@@ -4,7 +4,7 @@
   "description": "topcoder project to sync member stats from DynamoDB to ElasticSearch via Lambda",
   "main": "handler.js",
   "scripts": {
-    "serverless:offline": "AWS_REGION=localhost AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxx+ ES_ENDPOINT=http://127.0.0.1:9200 ES_REGION=ddblocal ES_INDEX=stats ES_DOCTYPE=member serverless offline start",
+    "serverless:offline": "AWS_REGION=localhost AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxx+ ES_ENDPOINT=http://127.0.0.1:9200 ES_REGION=ddblocal ES_INDEX=memberstats ES_DOCTYPE=_doc serverless offline start",
     "test": "jest"
   },
   "repository": {

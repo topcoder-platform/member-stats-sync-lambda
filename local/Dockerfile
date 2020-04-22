@@ -3,10 +3,11 @@ FROM node:12-alpine
 # Create app directory
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache bash git
+RUN apk add --no-cache bash git curl
 
 COPY package*.json ./
 RUN npm i
-RUN npm run postinstall
+
+COPY . .
 
 EXPOSE 5210 4210 3000

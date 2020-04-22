@@ -21,3 +21,20 @@ exports.generateESIndexID = function(keys){
   }
   return id;
 }
+
+exports.convertToEsDocument = function (doc) {
+  for (const key in doc) {
+    if (!doc.hasOwnProperty(key)) {
+      continue
+    }
+    const element = doc[key];
+    if (element.N) {
+      doc[key] = Number(element.N)
+    } else if (element.S) {
+      doc[key] = String(element.S)
+    } else {
+      doc[key] = exports.convertToEsDocument(element)
+    }
+  }
+  return doc
+}
