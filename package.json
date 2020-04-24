@@ -19,7 +19,8 @@
   "homepage": "https://github.com/topcoder-platform/member-stats-sync-lambda#readme",
   "dependencies": {
     "aws-sdk": "^2.466.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "aws-sdk-mock": "^4.4.0",
