@@ -21,12 +21,12 @@ export AWS_ACCESS_KEY_ID=<your serverless agent access key id>
 export AWS_SECRET_ACCESS_KEY=<your serverless agent secret access key>
 ```
 For the sake of unit testing to run, running your lambda function locally, and deploying your lambda's environment variables, please also setup 6 env variables below in your terminal (using export command as above).
-1. ES_DOCTYPE   --> Your ElasticSearch document type
-2. ES_ENDPOINT  --> Endpoint of your elastic search
-3. ES_INDEX     --> ElasticSearch Index for your documents
-4. ES_REGION    --> Region of your elastic search e.g. eu-west-1
-5. DB_STREAM    --> ARN of your DynamoDB Table Stream (by setting this, the DynamoDB trigger in Lambda doesn't need to be configured manually)
-6. LAMBDA_ROLE  --> ARN of IAM Role to be used when executing Lambda
+1. ES_STATS_MAPPING   --> Your ElasticSearch document type
+2. ES_ENDPOINT        --> Endpoint of your elastic search
+3. ES_STATS_INDEX     --> ElasticSearch Index for your documents
+4. ES_REGION          --> Region of your elastic search e.g. eu-west-1
+5. DB_STREAM          --> ARN of your DynamoDB Table Stream (by setting this, the DynamoDB trigger in Lambda doesn't need to be configured manually)
+6. LAMBDA_ROLE        --> ARN of IAM Role to be used when executing Lambda
 
 ## Change the serverless.yml to fit your environment
 Please open serverless.yml from the project and modify following value in case you don't want to use environment variables:

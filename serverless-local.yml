@@ -1,0 +1,125 @@
+service: member-stats-dynamodb-es-sync 
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
+  region: ${opt:region, 'eu-west-1'} # Overwrite the default region used. Default is us-east-1
+  stackName: serverless-member-stats-sync
+
+# you can add packaging information here
+package:
+  include:
+   - README.md
+   - node_modules/**
+   - index.js
+   - utils/**
+  exclude:
+   - test_data/**
+   - test/**
+   - package*.json
+   - serverless.yml
+
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-plugin-offline-dynamodb-stream
+  - serverless-offline
+
+
+custom:
+  serverless-offline:
+    dontPrintOutput: false
+  dynamodb:
+    stages:
+      - dev
+    start:
+      host: localhost
+      port: 8000
+      migrate: true
+      noStart: true
+  dynamodbStream:
+    host: localhost
+    port: 8000
+    streams:
+      - table: MemberStats_Private
+        functions:
+          - syncPrivate
+      - table: MemberStats
+        functions:
+          - sync
+
+functions:
+  syncPrivate:
+    handler: index.handleSync
+    role: ${env:LAMBDA_ROLE} 
+    description: Function to sync Dynamo DB member stats to Elastic Search # The description of your function
+    timeout: 30
+    events:
+     - stream:
+        arn: ${env:DB_STREAM}
+        batchSize: 100
+        startingPosition: LATEST
+        enabled: true
+    environment:
+      ES_ENDPOINT: ${env:ES_ENDPOINT}
+      ES_REGION: ${env:ES_REGION}
+      ES_STATS_INDEX: ${env:ES_STATS_INDEX}
+      ES_STATS_MAPPING: ${env:ES_STATS_MAPPING}
+      IS_PRIVATE: 'true'
+  sync:
+    handler: index.handleSync
+    role: ${env:LAMBDA_ROLE} 
+    description: Function to sync Dynamo DB member stats to Elastic Search # The description of your function
+    timeout: 30
+    events:
+     - stream:
+        arn: ${env:DB_STREAM}
+        batchSize: 100
+        startingPosition: LATEST
+        enabled: true
+    environment:
+      ES_ENDPOINT: ${env:ES_ENDPOINT}
+      ES_REGION: ${env:ES_REGION}
+      ES_STATS_INDEX: ${env:ES_STATS_INDEX}
+      ES_STATS_MAPPING: ${env:ES_STATS_MAPPING}
+
+resources:
+  Resources:
+    MemberStatsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        TableName: MemberStats
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
+        StreamSpecification:
+          StreamEnabled: true
+          StreamViewType: NEW_AND_OLD_IMAGES
+    MemberStatsPrivateTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: N
+          - AttributeName: groupId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: groupId
+            KeyType: RANGE
+        TableName: MemberStats_Private
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
+        StreamSpecification:
+          StreamEnabled: true
+          StreamViewType: NEW_AND_OLD_IMAGES

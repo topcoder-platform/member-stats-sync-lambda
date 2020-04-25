@@ -1,83 +1,39 @@
-var esDomain = {
-  endpoint: process.env.ES_ENDPOINT, //'http://search-es-order-f7zsro3nwrf26fx6w55unvbgve.eu-west-1.es.amazonaws.com', //process.env.ES_ENDPOINT,
-  region: process.env.ES_REGION, //'eu-west-1', //
-  index: process.env.ES_INDEX, //'stats',
-  doctype: process.env.ES_DOCTYPE //'member'
-};
 
-const isPrivate = Boolean(process.env.IS_PRIVATE)
 
-const AWS = require('aws-sdk');
-const path = require('path');
-const _ = require('lodash')
-const endpoint =  new AWS.Endpoint(esDomain.endpoint);
-const creds = new AWS.EnvironmentCredentials('AWS');
 const util = require('./utils/util.js');
+const elasticsearch = require('./utils/elastic-search.js');
 
 exports.handleSync = async (event, context, callback) => {
-  event.Records.forEach(record => {
-    if(record.eventName === "MODIFY" || record.eventName === "INSERT" || record.eventName === "REMOVE") {
-      exports.postDocumentToES(record.eventName, record.dynamodb.NewImage, record.dynamodb.Keys, context);
+  for (let count = 0; count < event.Records.length; count++) {
+    var record = event.Records[count]
+    if (record.eventName === "MODIFY" || record.eventName === "INSERT" || record.eventName === "REMOVE") {
+      const keys = util.unmarshallKeys(record.dynamodb.Keys)
+      if(keys.groupId) {
+        var id = keys.userId + "_" + keys.groupId
+        var doc = util.unmarshallToEsDocument(record.dynamodb.NewImage)
+        await postDocumentToES(record.eventName, doc, id, callback)
+      } else {
+        var id = keys.userId + "_10"
+        var doc = util.unmarshallToEsDocument(record.dynamodb.NewImage)
+        doc.groupId = "10"
+        await postDocumentToES(record.eventName, doc, id, callback)
+      }
     }
-  }); 
+  }
 }
 
-function postDocumentToES(eventName, doc, keys, context) {
-  var req = new AWS.HttpRequest(endpoint);
-  var send = new AWS.NodeHttpClient();
-
-  // generate ID for Elastic Search Document
-  var id = util.generateESIndexID(keys);
-
-  // constructing AWS Http Request based on eventName from the record 
-  if(eventName === "MODIFY"){
-    console.log("MODIFY even listened");
-    req.method = 'POST';
-    req.path = path.join('/', esDomain.index, esDomain.doctype, id);
-    req.region = esDomain.region;
-    if (!isPrivate) {
-      doc.groupId = 10
-    }
-    req.body = JSON.stringify(util.convertToEsDocument(doc));
-  }else if(eventName === "INSERT"){
-    console.log("INSERT even listened");
-    req.method = 'PUT';
-    req.path = path.join('/', esDomain.index, esDomain.doctype, id);
-    req.region = esDomain.region;
-    if (!isPrivate) {
-      doc.groupId = 10
-    }
-    req.body = JSON.stringify(util.convertToEsDocument(doc));
-  }else if(eventName === "REMOVE"){
-    console.log("REMOVE even listened");
-    req.method = 'DELETE';
-    req.path = path.join('/', esDomain.index, esDomain.doctype, id);
-    req.region = esDomain.region;
+async function postDocumentToES(eventName, doc, id, callback) {
+  if (eventName === "INSERT") {
+    console.log("INSERT event listener");
+    callback(null, await elasticsearch.create(id, doc))
+  } else if (eventName === "MODIFY") {
+    console.log("MODIFY event listener");
+    callback(null, await elasticsearch.update(id, doc))
+  } else if (eventName === "REMOVE") {
+    console.log("REMOVE event listener");
+    callback(null, await elasticsearch.remove(id))
   }
-  req.headers['presigned-expires'] = false;
-  req.headers['Host'] = endpoint.host;
-  req.headers['Content-Type'] = 'application/json';
-  // Sign the request (Sigv4)
-  var signer = new AWS.Signers.V4(req, 'es');
-  signer.addAuthorization(creds, new Date());
-
-  // Post document to ES
-  send.handleRequest(req, null, function(httpResp) {
-      var body = '';
-      httpResp.on('data', chunk => {body += chunk; console.log(JSON.stringify(body));});
-      httpResp.on('end', chunk => {
-        if (context && context.succeed && typeof context.succeed === 'function') {
-          context.succeed()
-        }
-      });
-      console.log("Successfully indexed the document in ElasticSearch !");
-  }, function(err) {
-      console.log('Error occured during indexing: ' + err);
-      if (context && context.succeed && typeof context.fail === 'function') {
-        context.fail()
-      };
-  });
 }
 
 // function postDocumentToES is exported to support Jest mocking in Unit Test
-exports.postDocumentToES = postDocumentToES;
+//exports.postDocumentToES = postDocumentToES;
