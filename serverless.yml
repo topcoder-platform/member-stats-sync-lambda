@@ -23,6 +23,34 @@ package:
    - serverless.yml
    - docs/media/**
 
+plugins:
+  - serverless-dynamodb-local
+  - serverless-plugin-offline-dynamodb-stream
+  - serverless-offline
+
+
+custom:
+  serverless-offline:
+    dontPrintOutput: false
+  dynamodb:
+    stages:
+      - local
+    start:
+      host: localhost
+      port: 8000
+      migrate: true
+      noStart: true
+  dynamodbStream:
+    host: localhost
+    port: 8000
+    streams:
+      - table: MemberStats_Private
+        functions:
+          - syncPrivate
+      - table: MemberStats
+        functions:
+          - sync
+
 functions:
   syncPrivate:
     handler: index.handleSync
@@ -61,3 +89,42 @@ functions:
       ES_STATS_INDEX: ${file(./config/${self:provider.stage}.json):ES_STATS_INDEX}
       ES_STATS_MAPPING: ${file(./config/${self:provider.stage}.json):ES_STATS_MAPPING}
       DB_STATS_PUBLIC_STREAM: ${file(./config/${self:provider.stage}.json):DB_STATS_PUBLIC_STREAM}
+      
+resources:
+  Resources:
+    MemberStatsTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        TableName: MemberStats
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
+        StreamSpecification:
+          StreamEnabled: true
+          StreamViewType: NEW_AND_OLD_IMAGES
+    MemberStatsPrivateTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: N
+          - AttributeName: groupId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: groupId
+            KeyType: RANGE
+        TableName: MemberStats_Private
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 6
+        StreamSpecification:
+          StreamEnabled: true
+          StreamViewType: NEW_AND_OLD_IMAGES
