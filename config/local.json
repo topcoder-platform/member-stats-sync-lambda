@@ -1,0 +1,10 @@
+{
+  "ES_ENDPOINT": "http://127.0.0.1:9200",
+  "ES_REGION": "us-east-1",
+  "ES_VERSION": "6.3",
+  "ES_STATS_INDEX": "memberstats",
+  "ES_STATS_MAPPING": "stats",
+  "DB_STATS_PUBLIC_STREAM": "",
+  "DB_STATS_PRIVATE_STREAM": "",
+  "LAMBDA_ROLE": ""
+}

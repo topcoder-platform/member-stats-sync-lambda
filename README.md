@@ -7,7 +7,7 @@
 4. Amazon ElasticSearch domain access policy has been configured so that AWS Lambda IAM role can do necessary action to post data to ElasticSearch and for unit test purpose, either using IP address or Serverless Agent IAM User below is given access to post data to ElasticSearch.
 5. Serverless Framework has been installed. If not yet done, please follow this [link](https://serverless.com/framework/docs/providers/aws/guide/installation/).
 6. Serverless Agent IAM User has been configured properly and its access key ID and its agent secret access key is known, please follow this [link](https://serverless.com/framework/docs/providers/aws/guide/credentials/) to setup one if not yet done.
-7. All the instructions below are using Node v9.11.2. 
+7. All the instructions below are using Node v10.x. 
 
 The prerequisites above are part of this documentation, please contact author (Gungz) if there're questions.
 
