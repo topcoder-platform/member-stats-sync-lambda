@@ -11,9 +11,6 @@
 
 The prerequisites above are part of this documentation, please contact author (Gungz) if there're questions.
 
-## Copy the Project
-Unzip the project file (member-stats-sync-lambda) from the unzipped Topcoder submission file, copy the project, and paste the project to designated location.
-
 ## Environment Variables
 Please follow this instruction to setup the required environment variables. We are using Linux terminal in this example.
 ```
@@ -42,9 +39,7 @@ The test files can be found in test folder.
 
 Run the following to invoke lambda locally.
 ```
-serverless invoke local -f sync -p test_data/test_insert.json`
-serverless invoke local -f sync -p test_data/test_update.json`
-serverless invoke local -f sync -p test_data/test_delete.json`
+serverless invoke local -f sync -p test_data/xxxxx.json`
 ```
 Please note that even if the lambda is invoked locally using test data, the data is still being posted to ElasticSearch in AWS based on environment variables above. In order for the local invocation to work properly, the serverless agent that is used by serverless command has to have privilege to post the data to ElasticSearch or the access policy for the ElasticSearch is configured to allow any AWS principal to post the data but restricted by condition e.g. by using IpAddress.  
 
@@ -58,5 +53,34 @@ Feel free to use flag `--verbose` after `serverless deploy` if you want to know 
 
 You can also modify the lambda code if required and the redeployment is as simple as running `serverless deploy` again.
 
-## Verification
-Please read verification document for screen shot of enabling DynamoDB table stream, unit test result, deployment results, and results of manual testing on the lambda.
+## Local Develop
+
+1. Update the serverless.yml file to for sections supporting local. looking for
+```
+#following are used for local env
+```
+
+2.  Setup Docker and Docker Compose locally, and run `docker-compose up`
+
+    ![A screenshot of a computer](./docs/media/image1.jpg)
+
+3.  Run `npm run serverless:offline`
+
+	![A screenshot of a computer screen](./docs/media/image2.jpg)
+
+4.  Go to [http://localhost:8001](http://localhost:8001), and click on the `MemberStats` table.
+
+    ![A screenshot of a computer](./docs/media/image3.jpg)
+
+5.  Click on the `Create Item` button.
+
+    ![A screenshot of a computer screen](./docs/media/image4.jpg)
+
+6.  Enter the following sample data into the content editor, and click on the `Save` button.
+
+    ![A screenshot of a computer screen](./docs/media/image5.jpg)
+
+7.  Go to [http://localhost:9200/memberstats/_search?pretty](http://localhost:9200/memberstats/_search?pretty) to ensure that
+    the data has been saved.
+
+    ![A screenshot of a computer screen](.//docs/media/image6.jpg)
