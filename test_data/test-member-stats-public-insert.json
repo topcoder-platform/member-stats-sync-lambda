@@ -1,0 +1,52 @@
+{
+  "Records": [
+    {
+      "eventID": "a125d251d4525b1a3cb633f2135964a2",
+      "eventName": "INSERT",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "us-east-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1587805594,
+        "Keys": {
+          "userId": {
+            "N": "100001"
+          }
+        },
+        "NewImage": {
+          "wins": {
+            "N": "0"
+          },
+          "DESIGN": {
+            "S": "{\"challenges\":0,\"wins\":0,\"subTracks\":[]}"
+          },
+          "challenges": {
+            "N": "106"
+          },
+          "DATA_SCIENCE": {
+            "S": "{\"challenges\":105,\"wins\":0,\"SRM\":{\"challenges\":105,\"wins\":0,\"rank\":{\"rating\":980,\"percentile\":42.18,\"rank\":1645,\"countryRank\":539,\"schoolRank\":0,\"volatility\":242,\"maximumRating\":1387,\"minimumRating\":694,\"defaultLanguage\":\"C#\",\"competitions\":105},\"mostRecentEventName\":\"SRM 776\",\"mostRecentEventDate\":1579910400000,\"challengeDetails\":[{\"levelName\":\"Level One\",\"challenges\":18,\"failedChallenges\":9},{\"levelName\":\"Level Two\",\"challenges\":21,\"failedChallenges\":13},{\"levelName\":\"Level Three\",\"challenges\":2,\"failedChallenges\":1}],\"division1\":[{\"levelName\":\"Level Three\",\"problemsSubmitted\":2,\"problemsFailed\":0,\"problemsSysByTest\":2},{\"levelName\":\"Level Two\",\"problemsSubmitted\":5,\"problemsFailed\":2,\"problemsSysByTest\":1},{\"levelName\":\"Level One\",\"problemsSubmitted\":24,\"problemsFailed\":5,\"problemsSysByTest\":2}],\"division2\":[{\"levelName\":\"Level One\",\"problemsSubmitted\":71,\"problemsFailed\":5,\"problemsSysByTest\":5},{\"levelName\":\"Level Two\",\"problemsSubmitted\":47,\"problemsFailed\":4,\"problemsSysByTest\":13},{\"levelName\":\"Level Three\",\"problemsSubmitted\":18,\"problemsFailed\":9,\"problemsSysByTest\":3}],\"mostRecentSubmission\":1579954487545},\"MARATHON_MATCH\":{\"challenges\":0,\"wins\":0,\"rank\":{\"rating\":0,\"competitions\":0,\"avgRank\":0,\"avgNumSubmissions\":0,\"bestRank\":0,\"topFiveFinishes\":0,\"topTenFinishes\":0,\"rank\":0,\"percentile\":0.0,\"volatility\":0.0,\"minimumRating\":0,\"maximumRating\":0,\"countryRank\":0,\"schoolRank\":0,\"defaultLanguage\":\"C#\"},\"mostRecentEventName\":null},\"mostRecentEventDate\":1579910400000,\"mostRecentEventName\":\"SRM 776\",\"mostRecentSubmission\":1579954487545}"
+          },
+          "handle": {
+            "S": "Member1"
+          },
+          "maxRating": {
+            "S": "{\"rating\":1115,\"track\":\"DEVELOP\",\"subTrack\":\"CODE\"}"
+          },
+          "userId": {
+            "N": "100001"
+          },
+          "handleLower": {
+            "S": "member1"
+          },
+          "DEVELOP": {
+            "S": "{\"challenges\":1,\"wins\":0,\"subTracks\":[{\"id\":150,\"name\":\"CODE\",\"challenges\":1,\"mostRecentEventDate\":1559854858000,\"submissions\":{\"numInquiries\":1,\"submissions\":0,\"submissionRate\":0.0,\"passedScreening\":0,\"screeningSuccessRate\":0.0,\"passedReview\":0,\"reviewSuccessRate\":0.0,\"appeals\":0,\"appealSuccessRate\":0.0,\"maxScore\":0.0,\"minScore\":0.0,\"avgScore\":0.0,\"avgPlacement\":0.0,\"winPercent\":0.0},\"rank\":{\"rating\":1115,\"activePercentile\":0.0,\"activeRank\":0,\"activeCountryRank\":0,\"activeSchoolRank\":0,\"overallPercentile\":0.0,\"overallRank\":0,\"overallCountryRank\":0,\"overallSchoolRank\":0,\"volatility\":385,\"reliability\":0.0},\"wins\":0}],\"mostRecentEventDate\":1559854858000}"
+          }
+        },
+        "SequenceNumber": "844737900000000011365738728",
+        "SizeBytes": 2437,
+        "StreamViewType": "NEW_AND_OLD_IMAGES"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:us-east-1:811668436784:table/MemberStats_Private/stream/2020-02-20T06:33:20.543"
+    }
+  ]
+}

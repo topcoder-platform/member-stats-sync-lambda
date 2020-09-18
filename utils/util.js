@@ -1,23 +1,33 @@
+const _ = require('lodash')
+const AWS = require('aws-sdk')
+
 /**
- * Generate Elastic Search Index Doc ID from Keys of DynamoDB record stream.
- * @param {Object} keys Keys of DynamoDB record stream.
- * @return {string} ID for Elastic Search Index Doc 
- * from concatenation of DynamoDB record stream keys
+ * Unmarshall the DynamoDB Keys
+ * @param {Object} doc DynamoDB keys
+ * @returns {Object} Elastic document
  */
-exports.generateESIndexID = function(keys){
-  var id = '';
-  var jsonKeys = Object.keys(keys);
-  for(var i=0; i<jsonKeys.length; i++){
-    var key = jsonKeys[i];
-    var jsonKeys2 = Object.keys(keys[key]);
-    for(var j=0; j<jsonKeys2.length; j++){
-      var key2 = jsonKeys2[j];
-      if(i==jsonKeys.length-1 && j==jsonKeys2.length-1){
-        id += keys[key][key2];
-      }else{
-        id += keys[key][key2] + "_";
-      }
-    }
+exports.unmarshallKeys = function (keys) {
+  return AWS.DynamoDB.Converter.unmarshall(keys)
+}
+
+/**
+ * Unmarshall DynamoDB payload into a document that can be inserted into ES.
+ * @param {Object} doc DynamoDB payload
+ * @returns {Object} Elastic document
+ */
+exports.unmarshallToEsDocument = function (payload) {
+  var payload = AWS.DynamoDB.Converter.unmarshall(payload)
+  if(payload.hasOwnProperty("DESIGN")) {
+    payload.DESIGN = JSON.parse(payload.DESIGN);
   }
-  return id;
+  if(payload.hasOwnProperty("DATA_SCIENCE")) {
+    payload.DATA_SCIENCE = JSON.parse(payload.DATA_SCIENCE);
+  }
+  if(payload.hasOwnProperty("maxRating")) {
+    payload.maxRating = JSON.parse(payload.maxRating);
+  }
+  if(payload.hasOwnProperty("DEVELOP")) {
+    payload.DEVELOP = JSON.parse(payload.DEVELOP);
+  }
+  return payload
 }
