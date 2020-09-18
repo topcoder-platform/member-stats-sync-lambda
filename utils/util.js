@@ -1,86 +1,33 @@
 const _ = require('lodash')
+const AWS = require('aws-sdk')
 
 /**
- * Generate Elastic Search Index Doc ID from Keys of DynamoDB record stream.
- * @param {Object} keys Keys of DynamoDB record stream.
- * @return {string} ID for Elastic Search Index Doc 
- * from concatenation of DynamoDB record stream keys
+ * Unmarshall the DynamoDB Keys
+ * @param {Object} doc DynamoDB keys
+ * @returns {Object} Elastic document
  */
-
-function getValue(keys, key) {
-  obj = keys[key]
-  if(obj) {
-    if (obj["N"]) {
-      return obj["N"]
-    }
-
-    if(obj["S"]) {
-      return obj["S"]
-    }
-  }
-}
-
-exports.generateESIndexID = function(keys){
-  var id = '';
-  var idparts = [];
-
-  // user id first
-  userId = getValue(keys, "userId")
-  if (userId) {
-    idparts.push(userId + "")
-  }
-
-  // group id second
-  userId = getValue(keys, "groupId")
-  if (userId) {
-    idparts.push(userId + "")
-  } else {
-    idparts.push("10")
-  }
-  
-  var jsonKeys = Object.keys(keys);
-  for(var i=0; i<jsonKeys.length; i++){
-    var key = jsonKeys[i];
-
-    if (key == "userId" || key == "groupId") {
-      continue
-    }
-
-    v = getValue(keys, key)
-    if (v) {
-      idparts.push(v + "")
-    }
-  }
-
-  return idparts.join("_");
+exports.unmarshallKeys = function (keys) {
+  return AWS.DynamoDB.Converter.unmarshall(keys)
 }
 
 /**
- * Converts a DynamoDB payload into a document that can be inserted into ES.
+ * Unmarshall DynamoDB payload into a document that can be inserted into ES.
  * @param {Object} doc DynamoDB payload
  * @returns {Object} Elastic document
  */
-exports.convertToEsDocument = function (payload) {
-  for (const key in payload) {
-    if (!payload.hasOwnProperty(key)) {
-      continue
-    }
-    const element = payload[key];
-    if (element.N) {
-      payload[key] = Number(element.N)
-    } else if (element.S) {
-      let value = element.S
-      try {
-        value = JSON.parse(element.S)
-      } catch(e){}
-      if (!_.isString(value)) {
-        payload[key] = value
-      } else {
-        payload[key] = String(element.S)
-      }
-    } else {
-      payload[key] = exports.convertToEsDocument(element)
-    }
+exports.unmarshallToEsDocument = function (payload) {
+  var payload = AWS.DynamoDB.Converter.unmarshall(payload)
+  if(payload.hasOwnProperty("DESIGN")) {
+    payload.DESIGN = JSON.parse(payload.DESIGN);
+  }
+  if(payload.hasOwnProperty("DATA_SCIENCE")) {
+    payload.DATA_SCIENCE = JSON.parse(payload.DATA_SCIENCE);
+  }
+  if(payload.hasOwnProperty("maxRating")) {
+    payload.maxRating = JSON.parse(payload.maxRating);
+  }
+  if(payload.hasOwnProperty("DEVELOP")) {
+    payload.DEVELOP = JSON.parse(payload.DEVELOP);
   }
   return payload
 }
