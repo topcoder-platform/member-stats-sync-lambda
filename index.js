@@ -1,5 +1,3 @@
-
-
 const util = require('./utils/util.js');
 const elasticsearch = require('./utils/elastic-search.js');
 

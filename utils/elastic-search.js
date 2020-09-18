@@ -55,6 +55,7 @@ var obj = {
   },
   get: async function (id) {
     const client = await this.getESClient()
+    await obj.stabilization(client, 1)
     var response = await client.get({
       index: config.get('ES_STATS_INDEX'),
       type: config.get('ES_STATS_MAPPING'),
@@ -62,13 +63,27 @@ var obj = {
     })
     return obj.checkStatus(response)
   },
+  stabilization: async function (client, count) {
+    var check
+    try {
+      check = await client.ping({ requestTimeout: 10000 })
+      return true
+    } catch (ex) {
+      console.log("Waiting for stabilization of ES server :: " + count)
+      await obj.sleep(10000)
+      return await obj.stabilization(client, count + 1)
+    }
+  },
+  sleep: async function (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
   create: async function (id, data) {
     const { error } = Joi.validate(data, createUpdateSchema, { abortEarly: false });
     if (error)
       return error
-
+    
     const client = await this.getESClient()
-
+    await obj.stabilization(client, 1)
     if(!await obj.exists(id)) {
       var response = await client.create({
         index: config.get('ES_STATS_INDEX'),
@@ -88,6 +103,7 @@ var obj = {
       return error
 
     const client = await this.getESClient()
+    await obj.stabilization(client, 1)
     var response = await client.update({
       index: config.get('ES_STATS_INDEX'),
       type: config.get('ES_STATS_MAPPING'),
@@ -101,6 +117,7 @@ var obj = {
   },
   remove: async function (id) {
     const client = await this.getESClient()
+    await obj.stabilization(client, 1)
     if(await obj.exists(id)) {
       var response = await client.delete({
         index: config.get('ES_STATS_INDEX'),
