@@ -23,13 +23,19 @@ exports.handleSync = async (event, context, callback) => {
 async function postDocumentToES(eventName, doc, id, callback) {
   if (eventName === "INSERT") {
     console.log("INSERT event listener");
-    callback(null, await elasticsearch.create(id, doc))
+    var response = await elasticsearch.create(id, doc)
+    console.log(response);
+    callback(null, response)
   } else if (eventName === "MODIFY") {
     console.log("MODIFY event listener");
-    callback(null, await elasticsearch.update(id, doc))
+    var response = await elasticsearch.update(id, doc)
+    console.log(response);
+    callback(null, response)
   } else if (eventName === "REMOVE") {
     console.log("REMOVE event listener");
-    callback(null, await elasticsearch.remove(id))
+    var response = await elasticsearch.remove(id)
+    console.log(response);
+    callback(null, response)
   }
 }
 

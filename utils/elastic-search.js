@@ -25,23 +25,10 @@ AWS.config.region = esAwsRegion
 var obj = {
   getESClient: async function () {
     if (!esClient) {
-      // if (/.*amazonaws.*/.test(esUrl)) {
-      //   console.log("Test Fail :::::::::::: remote")
-      //   esClient = new elasticsearch.Client({
-      //     apiVersion: esApiVersion,
-      //     hosts: esUrl,
-      //     connectionClass: require('http-aws-es'), // eslint-disable-line global-require
-      //     amazonES: {
-      //       region: esAwsRegion,
-      //       credentials: new AWS.EnvironmentCredentials('AWS')
-      //     }
-      //   })
-      // } else {
-        esClient = new elasticsearch.Client({
-          apiVersion: esApiVersion,
-          hosts: esUrl
-        })
-      // }
+      esClient = new elasticsearch.Client({
+        apiVersion: esApiVersion,
+        hosts: esUrl
+      })
     }
     return esClient
   },
@@ -93,8 +80,7 @@ var obj = {
       })
       return obj.checkStatus(response)
     } else {
-      var errMsg = { "errorMessage": "Doc Exists In ES : " + id }
-      return obj.checkStatus(errMsg)
+      return await obj.update(id, data)
     }
   },
   update: async function (id, data) {
